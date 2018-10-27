@@ -2,28 +2,32 @@ var express        =         require("express");
 var bodyParser     =         require("body-parser");
 var app            =         express();
 var http = require("http");
-var mysql = require('mysql');
 
-var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "hallo111",
-  database: "jobTrans"
+const { Pool, Client } = require('pg');
 
+
+var pool = new Pool({
+  user: 'dbuser',
+  host: 'database.server.com',
+  database: 'mydb',
+  password: 'secretpassword',
+  port: 5432,
 });
 
-/*con.connect(function(err) {
-  if (err) throw err;
-  con.query("SELECT * FROM jobs", function (err, result, fields) {
-    if (err) throw err;
-    response.send(result);
-   // console.log(result);
-  });
-});*/
-//
+var client = new Client({
+  user: 'ufjojhdqyyepxv',
+  host: 'ec2-75-101-138-26.compute-1.amazonaws.com',
+  database: 'dek32urh8p319c',
+  password: 'e820c4b8bc8784d457ffe4af407f6a0f338af4d8cf4f3151964352438ab92604',
+  port: 5432,
+});
+
+
+client.connect();
+
 
 app.get('/jobs', (request, response) => {
-    con.query('SELECT * FROM jobs', (error, result) => {
+    client.query('SELECT * FROM jobs', (error, result) => {
         if (error) throw error;
  
         response.send(result);
@@ -32,10 +36,12 @@ app.get('/jobs', (request, response) => {
 
 app.get('/jobs/:berufsfeld',(request, response) => {
 var ber = request.params.berufsfeld;
-var sql = "SELECT * FROM jobs Where berufsfeld = ?";
-    con.query(sql,[ber],(error, result) => {
+
+var sql = "SELECT * FROM jobs Where berufsfeld ='"+ber+"'";
+
+    client.query(sql,(error, result) => { 
         if (error) throw error;
- console.log(ber);
+ 
         response.send(result);
     });
 }); 
